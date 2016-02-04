@@ -22,7 +22,7 @@ function varargout = Prueba_guide(varargin)
 
 % Edit the above text to modify the response to help Prueba_guide
 
-% Last Modified by GUIDE v2.5 29-Jan-2016 13:44:07
+% Last Modified by GUIDE v2.5 03-Feb-2016 12:43:23
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -59,8 +59,13 @@ handles.C = [];
 handles.F = [];
 handles.np = []; % curva seleccionada
 
+set(hObject,'WindowButtonDownFcn',{@my_MouseClickFcn,hObject});
+set(hObject,'WindowButtonUpFcn',{@my_MouseReleaseFcn,hObject});
+
 % primitiva
 handles.primitiva_n = struct('marcas',[],'pixel',[]);
+
+
 
 
 % Update handles structure
@@ -339,7 +344,7 @@ hold off
 
  
    set(fighandle,'Pointer',oldpointer)
-   set(fighandle,'WindowButtonUpFcn',[]);
+   %set(fighandle,'WindowButtonUpFcn',[]);
   
 % pointslist and xselect, yselect are already complete.
 %     begin nested functions
@@ -477,3 +482,72 @@ end
    
    
     
+
+
+% --- Executes on button press in checkMove.
+function checkMove_Callback(hObject, eventdata, handles)
+% hObject    handle to checkMove (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of checkMove
+
+
+% --- Executes on button press in pushMove.
+function pushMove_Callback(hObject, eventdata, handles)
+% hObject    handle to pushMove (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+n = handles.np
+
+function my_MouseClickFcn(obj,event,hObject)
+handles=guidata(hObject);
+set(handles.figure1,'WindowButtonMotionFcn',{@my_MouseMoveFcn,hObject});
+guidata(hObject,handles)
+ 
+function my_MouseReleaseFcn(obj,event,hObject)
+handles=guidata(hObject);
+set(handles.figure1,'WindowButtonMotionFcn','');
+disp('liberado')
+guidata(hObject,handles);
+
+
+ function my_MouseMoveFcn(obj,event,hObject)
+ handles=guidata(hObject);
+%move_p = get(handles.checkMove,'Value')
+mousepos=get(handles.axes1,'CurrentPoint');
+x = handles.primitiva_n(handles.np).pixel(:,1);
+y = handles.primitiva_n(handles.np).pixel(:,2);
+
+xm = handles.primitiva_n(handles.np).marcas(:,1);
+ym = handles.primitiva_n(handles.np).marcas(:,2);
+% x=get(handles.redbox,'xdata');
+% y=get(handles.redbox,'ydata');
+x_rel=x-x(1);
+y_rel=y-y(1);
+plot(x_rel+mousepos(1,1),y_rel+mousepos(1,2),'b.')
+hold on
+x_relm=xm-xm(1);
+y_relm=ym-ym(1);
+plot(x_relm+mousepos(1,1),y_relm+mousepos(1,2),'r+')
+hold off
+
+
+% x_relc=xm-x(1);
+% y_relc=ym-y(1);
+
+ axis([-0.5 256.5 -0.5 256.5])
+ set(gca,'Xtick',[],'Ytick',[]);
+%set(handles.redbox,'xdata',mousepos(1,1)+x_rel);
+%set(handles.redbox,'ydata',mousepos(1,2)+y_rel);
+
+
+
+% --- Executes on key press with focus on pushMove and none of its controls.
+function pushMove_KeyPressFcn(hObject, eventdata, handles)
+% hObject    handle to pushMove (see GCBO)
+% eventdata  structure with the following fields (see UICONTROL)
+%	Key: name of the key that was pressed, in lower case
+%	Character: character interpretation of the key(s) that was pressed
+%	Modifier: name(s) of the modifier key(s) (i.e., control, shift) pressed
+% handles    structure with handles and user data (see GUIDATA)
